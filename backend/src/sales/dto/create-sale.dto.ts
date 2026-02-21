@@ -1,15 +1,15 @@
 import {
   IsArray,
   ValidateNested,
-  IsUUID,
   IsInt,
   Min,
   ArrayNotEmpty,
+  IsString,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class SaleItemDto {
-  @IsUUID()
+  @IsString()
   productId: string;
 
   @IsInt()

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsUUID, IsNumber, Min } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateProductDto {
@@ -11,6 +11,7 @@ export class CreateProductDto {
   @Min(0)
   price: number;
 
-  @IsUUID()
+  @IsString()
+  @IsNotEmpty()
   categoryId: string;
 }
