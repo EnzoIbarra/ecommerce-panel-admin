@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Home, ShoppingCart, Package } from 'lucide-react';
+import { Home, ShoppingCart, Package, Shapes } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
@@ -9,7 +9,7 @@ const links = [
 	{ href: '/dashboard', label: 'Inicio', icon: Home },
 	{ href: '/sales', label: 'Ventas', icon: ShoppingCart },
 	{ href: '/products', label: 'Productos', icon: Package },
-	{ href: '/categories', label: 'Categorias', icon: Package },
+	{ href: '/categories', label: 'Categorias', icon: Shapes },
 ];
 
 export default function Sidebar() {

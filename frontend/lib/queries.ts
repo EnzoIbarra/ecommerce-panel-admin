@@ -32,12 +32,15 @@ export type SaleItem = {
 export type Sale = {
 	id: string;
 	orderNumber: string;
+	customerEmail: string;
 	total: number;
 	status: string;
 	paymentStatus: string;
 	createdAt: string;
 	items: SaleItem[];
-	customerName?: string;
+	customerName: string;
+	paymentMethod: string;
+	shippingAddress: string;
 };
 
 export type Category = {
@@ -148,6 +151,40 @@ export function useUpdateProduct() {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['products'] });
+		},
+	});
+}
+
+export function useCreateSale() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async (payload: {
+			customerName: string;
+			customerEmail: string;
+			shippingAddress: string;
+			items: { productId: string; quantity: number }[];
+		}) => {
+			const { data } = await api.post('/sales', payload);
+			return data;
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['sales'] });
+			queryClient.invalidateQueries({ queryKey: ['products'] });
+		},
+	});
+}
+
+export function useUpdateSaleStatus() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async ({ id, status }: { id: string; status: string }) => {
+			const { data } = await api.patch(`/sales/${id}/status`, { status });
+			return data;
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['sales'] });
 		},
 	});
 }

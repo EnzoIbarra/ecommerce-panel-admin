@@ -17,6 +17,13 @@ const statusMap: Record<
 	CANCELLED: 'cancelled',
 };
 
+const statusLabelMap: Record<Sale['status'], string> = {
+	PREPARING: 'En preparación',
+	SENT: 'Enviado',
+	COMPLETED: 'Completado',
+	CANCELLED: 'Cancelado',
+};
+
 export default function RecentSalesCard() {
 	const { data: sales = [], isLoading } = useSales();
 
@@ -65,7 +72,10 @@ export default function RecentSalesCard() {
 							</div>
 
 							<div>
-								<Badge variant={statusMap[sale.status]} label={sale.status} />
+								<Badge
+									variant={statusMap[sale.status]}
+									label={statusLabelMap[sale.status]}
+								/>
 							</div>
 						</div>
 					))

@@ -23,6 +23,7 @@ export default function LoginForm() {
 
 	const [showPassword, setShowPassword] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 	const {
 		register,
@@ -38,9 +39,22 @@ export default function LoginForm() {
 
 	const isValid = email?.includes('@') && password?.length > 0;
 
+	const emailRegister = register('email', {
+		required: 'El correo es obligatorio',
+		pattern: {
+			value: /\S+@\S+\.\S+/,
+			message: 'Debe ser un correo válido',
+		},
+	});
+
+	const passwordRegister = register('password', {
+		required: 'La contraseña es obligatoria',
+	});
+
 	const onSubmit = async (data: LoginData) => {
 		try {
 			setLoading(true);
+			setErrorMessage(null);
 
 			const response = await api.post('/auth/login', {
 				email: data.email,
@@ -51,9 +65,25 @@ export default function LoginForm() {
 
 			setToken(token, data.remember);
 
+			document.cookie = `auth_token=${token}; path=/; ${
+				data.remember ? 'max-age=604800;' : ''
+			}`;
+
 			router.push('/dashboard');
-		} catch (error) {
-			console.error(error);
+		} catch (error: unknown) {
+			if (typeof error === 'object' && error !== null && 'response' in error) {
+				const err = error as {
+					response?: { status?: number };
+				};
+
+				if (err.response?.status === 401) {
+					setErrorMessage('Correo o contraseña incorrectos.');
+				} else {
+					setErrorMessage('Ocurrió un error. Intenta nuevamente.');
+				}
+			} else {
+				setErrorMessage('Ocurrió un error. Intenta nuevamente.');
+			}
 		} finally {
 			setLoading(false);
 		}
@@ -83,13 +113,11 @@ export default function LoginForm() {
 					<Input
 						type='email'
 						placeholder='ejemplo@mail.com'
-						{...register('email', {
-							required: 'El correo es obligatorio',
-							pattern: {
-								value: /\S+@\S+\.\S+/,
-								message: 'Debe ser un correo válido',
-							},
-						})}
+						{...emailRegister}
+						onChange={(e) => {
+							setErrorMessage(null);
+							emailRegister.onChange(e);
+						}}
 						className={`mt-1 ${
 							errors.email ? 'border-destructive focus:ring-destructive' : ''
 						}`}
@@ -106,9 +134,11 @@ export default function LoginForm() {
 					<div className='relative'>
 						<Input
 							type={showPassword ? 'text' : 'password'}
-							{...register('password', {
-								required: 'La contraseña es obligatoria',
-							})}
+							{...passwordRegister}
+							onChange={(e) => {
+								setErrorMessage(null);
+								passwordRegister.onChange(e);
+							}}
 							className={`mt-1 pr-10 ${
 								errors.password
 									? 'border-destructive focus:ring-destructive'
@@ -132,8 +162,12 @@ export default function LoginForm() {
 
 				<div className='flex items-center gap-2 text-sm'>
 					<Checkbox {...register('remember')} />
-					<span>Manterner sesión iniciada</span>
+					<span>Mantener sesión iniciada</span>
 				</div>
+
+				{errorMessage && (
+					<p className='text-sm text-destructive text-center'>{errorMessage}</p>
+				)}
 
 				<Button
 					type='submit'

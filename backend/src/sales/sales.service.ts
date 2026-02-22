@@ -11,6 +11,10 @@ import { randomUUID } from 'crypto';
 type SaleResponse = {
   id: string;
   orderNumber: string;
+  customerName: string;
+  customerEmail: string;
+  paymentMethod: string;
+  shippingAddress: string;
   total: number;
   status: SaleStatus;
   paymentStatus: PaymentStatus;
@@ -68,10 +72,10 @@ export class SalesService {
       const sale = await tx.sale.create({
         data: {
           orderNumber,
-          customerName: 'Cliente Demo',
-          customerEmail: 'cliente@demo.com',
+          customerName: data.customerName,
+          customerEmail: data.customerEmail,
+          shippingAddress: data.shippingAddress,
           paymentMethod: 'Credit Card',
-          shippingAddress: 'Dirección Demo',
           total,
           status: SaleStatus.PREPARING,
           paymentStatus: PaymentStatus.PAID,
@@ -144,6 +148,10 @@ export class SalesService {
     return {
       id: sale.id,
       orderNumber: sale.orderNumber,
+      customerName: sale.customerName,
+      customerEmail: sale.customerEmail,
+      shippingAddress: sale.shippingAddress,
+      paymentMethod: sale.paymentMethod,
       total: Number(sale.total),
       status: sale.status,
       paymentStatus: sale.paymentStatus,

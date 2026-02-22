@@ -5,6 +5,7 @@ import {
   Min,
   ArrayNotEmpty,
   IsString,
+  IsEmail,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -18,6 +19,15 @@ class SaleItemDto {
 }
 
 export class CreateSaleDto {
+  @IsString()
+  customerName: string;
+
+  @IsEmail()
+  customerEmail: string;
+
+  @IsString()
+  shippingAddress: string;
+
   @IsArray()
   @ArrayNotEmpty()
   @ValidateNested({ each: true })
