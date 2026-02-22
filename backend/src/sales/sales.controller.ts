@@ -37,3 +37,5 @@ export class SalesController {
     return this.salesService.updateStatus(id, dto.status, req.user.email);
   }
 }
+// npm run start:dev
+// cd backend
