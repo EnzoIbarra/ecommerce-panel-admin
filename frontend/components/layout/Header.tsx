@@ -1,11 +1,10 @@
 'use client';
 
-import { Bell, Sun } from 'lucide-react';
+import { Bell, Sun, Moon } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import Image from 'next/image';
 import { useState, useRef, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 
 const routeTitles: Record<string, string> = {
 	'/dashboard': 'Inicio',
@@ -14,13 +13,31 @@ const routeTitles: Record<string, string> = {
 	'/categories': 'Categorías',
 };
 
+function getInitialTheme(): boolean {
+	if (typeof window === 'undefined') return false;
+
+	const storedTheme = localStorage.getItem('theme');
+	const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+	return storedTheme === 'dark' || (!storedTheme && prefersDark);
+}
+
 export default function Header() {
 	const pathname = usePathname();
 	const router = useRouter();
 	const title = routeTitles[pathname] ?? '';
 
 	const [open, setOpen] = useState(false);
+	const [isDark, setIsDark] = useState(getInitialTheme);
 	const dropdownRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		if (isDark) {
+			document.documentElement.classList.add('dark');
+		} else {
+			document.documentElement.classList.remove('dark');
+		}
+	}, [isDark]);
 
 	useEffect(() => {
 		function handleClickOutside(event: MouseEvent) {
@@ -36,7 +53,15 @@ export default function Header() {
 		return () => document.removeEventListener('mousedown', handleClickOutside);
 	}, []);
 
-	const handleLogout = async () => {
+	const toggleTheme = () => {
+		setIsDark((prev) => {
+			const next = !prev;
+			localStorage.setItem('theme', next ? 'dark' : 'light');
+			return next;
+		});
+	};
+
+	const handleLogout = () => {
 		document.cookie = 'auth_token=; path=/; max-age=0;';
 		router.push('/login');
 	};
@@ -53,8 +78,8 @@ export default function Header() {
 					<Bell size={18} />
 				</Button>
 
-				<Button variant='ghost' size='icon'>
-					<Sun size={18} />
+				<Button variant='ghost' size='icon' onClick={toggleTheme}>
+					{isDark ? <Sun size={18} /> : <Moon size={18} />}
 				</Button>
 
 				<div className='relative' ref={dropdownRef}>
